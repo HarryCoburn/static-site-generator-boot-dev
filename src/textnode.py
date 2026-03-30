@@ -7,6 +7,7 @@ class TextType(Enum):
     CODE = "code"
     LINK = "link"
     IMAGE = "image"
+    TEXT = "text"
 
 
 class TextNode:
@@ -16,7 +17,7 @@ class TextNode:
         self.url = url  # URL of link or image, or None
 
     def __eq__(self, other):
-        if other is not TextNode:
+        if not isinstance(other, TextNode):
             return False
         return (
             self.text == other.text
