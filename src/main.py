@@ -149,33 +149,39 @@ def extract_title(markdown):
 
 
 def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-    markdown = ""
-    output = ""
-    with open(from_path, "r") as file:
-        markdown = file.read()
-    with open(template_path, "r") as template_file:
-        output = template_file.read()
-    html_string = markdown_to_html_node(markdown).to_html()
-    page_title = extract_title(markdown)
+    for file in os.listdir(from_path):
+        src_file_path = os.path.join(from_path, file)
+        dest_file_path = os.path.join(dest_path, file)
 
-    output = output.replace("{{ Title }}", page_title)
-    output = output.replace("{{ Content }}", html_string)
+        if os.path.isfile(src_file_path):
+            dest_file_path = dest_file_path.replace(".md", ".html")
+            print(
+                f"Generating page from {src_file_path} to {dest_file_path} using {template_path}"
+            )
 
-    if not os.path.exists(dest_path):
-        os.makedirs(dest_path)
+            with open(src_file_path, "r") as f:
+                markdown = f.read()
+            with open(template_path, "r") as f:
+                output = f.read()
 
-    file_name = os.path.basename(from_path).replace(".md", ".html")
-    full_dest_path = dest_path + "/" + file_name
-    print(f"Trying to write {full_dest_path} ")
-    with open(full_dest_path, "w") as html:
-        html.write(output)
+            html_string = markdown_to_html_node(markdown).to_html()
+            page_title = extract_title(markdown)
+
+            output = output.replace("{{ Title }}", page_title)
+            output = output.replace("{{ Content }}", html_string)
+
+            os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
+
+            with open(dest_file_path, "w") as f:
+                f.write(output)
+        else:
+            generate_page(src_file_path, template_path, dest_file_path)
 
 
 def main():
     clear_public()
     copy_static_to_public()
-    generate_page("content/index.md", "template.html", "public")
+    generate_page("content", "template.html", "public")
 
 
 main()
