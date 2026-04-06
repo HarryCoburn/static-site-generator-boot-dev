@@ -73,16 +73,23 @@ def block_to_html_node(block, block_type):
 
 def text_to_children(node, block_type):
     """Takes the text of a block and makes the appropriate child nodes"""
-    if (
-        block_type == BlockType.PARAGRAPH
-        or block_type == BlockType.HEADING
-        or block_type == BlockType.QUOTE
-    ):
+    if block_type == BlockType.PARAGRAPH or block_type == BlockType.HEADING:
         text = node.value.replace("\n", " ")
         sub_nodes = text_to_textnodes(text)
         leaf_nodes = []
         for sub_node in sub_nodes:
             leaf_nodes.append(text_node_to_html_node(sub_node))
+        return ParentNode(node.tag, leaf_nodes)
+    elif block_type == BlockType.QUOTE:
+        split_text = node.value.split("\n")
+        leaf_nodes = []
+        for text in split_text:
+            text = text[1:].strip()
+            sub_nodes = text_to_textnodes(text)
+            sub_leaf_nodes = []
+            for sub_node in sub_nodes:
+                sub_leaf_nodes.append(text_node_to_html_node(sub_node))
+            leaf_nodes.append(ParentNode("p", sub_leaf_nodes))
         return ParentNode(node.tag, leaf_nodes)
     elif block_type == BlockType.UNORDERED_LIST:
         split_text = node.value.split("\n")
