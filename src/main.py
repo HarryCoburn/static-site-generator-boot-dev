@@ -120,13 +120,13 @@ def text_to_children(node, block_type):
 
 def clear_public():
     """Deletes and recreates the public directory."""
-    if os.path.exists("public"):
+    if os.path.exists("docs"):
         print("Public directory exists. Deleting before creation.")
-        shutil.rmtree("public")
+        shutil.rmtree("docs")
     else:
         print("Public directory is not created. Creating")
 
-    os.mkdir("public")
+    os.mkdir("docs")
     print("Public directory should be made")
     return
 
@@ -134,14 +134,14 @@ def clear_public():
 def copy_static_to_public(top_dir="static"):
     """Copies the items from Static directory to Public directory."""
     static_list = os.listdir(top_dir)
-    public_path = top_dir.replace("static", "public", 1)
+    public_path = top_dir.replace("static", "docs", 1)
     if not os.path.exists(public_path):
         os.mkdir(public_path)
 
     for item in static_list:
         item_path = os.path.join(top_dir, item)
         if os.path.isfile(item_path):
-            shutil.copy(item_path, item_path.replace("static", "public", 1))
+            shutil.copy(item_path, item_path.replace("static", "docs", 1))
         else:
             new_path = top_dir + "/" + item
             copy_static_to_public(new_path)
