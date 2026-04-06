@@ -1,4 +1,7 @@
-from htmlnode import LeafNode
+import re
+
+from blocktype import BlockType, block_to_block_type
+from htmlnode import HTMLNode, LeafNode, ParentNode
 from node_func import markdown_to_blocks
 from textnode import TextNode, TextType
 
@@ -23,12 +26,42 @@ def text_node_to_html_node(text_node):
 
 def markdown_to_html_node(document):
     blocks = markdown_to_blocks(document)
-    print(blocks)
+    node_list = []
+
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        node = block_to_html_node(block, block_type)
+        node_list.append(node)
+
+    return node_list
+
+
+def block_to_html_node(block, block_type):
+    match block_type:
+        case BlockType.PARAGRAPH:
+            return HTMLNode("p", block)
+        case BlockType.HEADING:
+            match = re.match(r"^(#{1,6}) ", block)
+            level = len(match.group(1))
+            return HTMLNode(
+                f"h{level}", block[level + 1 :]
+            )  # This should get the space
+        case BlockType.QUOTE:
+            return HTMLNode("blockquote", block)
+        case BlockType.UNORDERED_LIST:
+            return HTMLNode("ul", block)
+        case BlockType.ORDERED_LIST:
+            return HTMLNode("ol", block)
+        case BlockType.CODE:
+            return HTMLNode("pre", block)
+
+        case _:
+            raise ValueError("block_to_html_node received unknown BlockType")
 
 
 def main():
     document = """\
-Paragraph
+Paragraph *with some inline* _text stuff_
 
 ### Heading 3
 
