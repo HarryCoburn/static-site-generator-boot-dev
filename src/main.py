@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import sys
 
 from blocktype import BlockType, block_to_block_type
 from htmlnode import HTMLNode, LeafNode, ParentNode
@@ -155,7 +156,7 @@ def extract_title(markdown):
     raise Exception("Markdown page has no H1 header for the page title.")
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_pages(from_path, template_path, dest_path, basepath):
     for file in os.listdir(from_path):
         src_file_path = os.path.join(from_path, file)
         dest_file_path = os.path.join(dest_path, file)
@@ -176,19 +177,22 @@ def generate_page(from_path, template_path, dest_path):
 
             output = output.replace("{{ Title }}", page_title)
             output = output.replace("{{ Content }}", html_string)
+            output = output.replace('href="/', f'href="{basepath}')
+            output = output.replace('src="/', f'src="{basepath}')
 
             os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
 
             with open(dest_file_path, "w") as f:
                 f.write(output)
         else:
-            generate_page(src_file_path, template_path, dest_file_path)
+            generate_pages(src_file_path, template_path, dest_file_path, basepath)
 
 
 def main():
+    basepath = sys.argv[1]
     clear_public()
     copy_static_to_public()
-    generate_page("content", "template.html", "public")
+    generate_pages("content", "template.html", "docs", basepath)
 
 
 main()
