@@ -10,11 +10,15 @@ class TestLeafNode(unittest.TestCase):
         node = LeafNode("p", "Hello, world, again!", {})
         self.assertEqual(node.to_html(), "<p>Hello, world, again!</p>")
 
-    def test_leave_to_html_a(self):
+    def test_leaf_to_html_a(self):
         node = LeafNode("a", "Google", {"href": "https://google.com"})
         self.assertEqual(node.to_html(), '<a href="https://google.com">Google</a>')
 
-    def test_leave_to_raw_txt(self):
+    def test_leaf_to_html_img(self):
+        node = LeafNode("img", "Google", {"href": "https://google.com"})
+        self.assertEqual(node.to_html(), '<img src="https://google.com" alt="Google">')
+
+    def test_leaf_to_raw_txt(self):
         node = LeafNode(None, "This is raw!")
         self.assertEqual(node.to_html(), "This is raw!")
 

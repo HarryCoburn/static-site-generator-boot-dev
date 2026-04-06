@@ -20,7 +20,7 @@ def text_node_to_html_node(text_node):
         case TextType.CODE:
             return LeafNode("code", text_node.text)
         case TextType.LINK:
-            return LeafNode("a", text_node.text, {"url": text_node.url})
+            return LeafNode("a", text_node.text, {"href": text_node.url})
         case TextType.IMAGE:
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
@@ -165,7 +165,7 @@ def generate_page(from_path, template_path, dest_path):
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
 
-    file_name = os.path.basename(from_path)
+    file_name = os.path.basename(from_path).replace(".md", ".html")
     full_dest_path = dest_path + "/" + file_name
     print(f"Trying to write {full_dest_path} ")
     with open(full_dest_path, "w") as html:

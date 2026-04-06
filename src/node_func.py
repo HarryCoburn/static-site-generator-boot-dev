@@ -52,14 +52,14 @@ def split_nodes_image(old_nodes):
         if node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
-        if " ![" not in node.text:
+        if "![" not in node.text:
             new_nodes.append(node)
             continue
-
         split_text_list = re.split(r"(!\[.*?\]\(.*?\))", node.text)
         sub_node_list = []
         for item in split_text_list:
             if item.startswith("!["):
+                print("Trying to make an TextNode of type IMAGE")
                 match = extract_markdown_images(item)[0]
                 alt, url = match
                 sub_node_list.append(TextNode(alt, TextType.IMAGE, url))
