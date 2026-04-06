@@ -1,5 +1,6 @@
+import os
 import re
-from shlex import split
+import shutil
 
 from blocktype import BlockType, block_to_block_type
 from htmlnode import HTMLNode, LeafNode, ParentNode
@@ -109,31 +110,39 @@ def text_to_children(node, block_type):
         return ParentNode(node.tag, leaf_nodes)
 
 
+def clear_public():
+    """Deletes and recreates the public directory."""
+    if os.path.exists("public"):
+        print("Public directory exists. Deleting before creation.")
+        shutil.rmtree("public")
+    else:
+        print("Public directory is not created. Creating")
+
+    os.mkdir("public")
+    print("Public directory should be made")
+    return
+
+
+def copy_static_to_public(top_dir="static"):
+    """Copies the items from Static directory to Public directory."""
+    static_list = os.listdir(top_dir)
+    public_path = top_dir.replace("static", "public", 1)
+    if not os.path.exists(public_path):
+        os.mkdir(public_path)
+
+    for item in static_list:
+        item_path = os.path.join(top_dir, item)
+        if os.path.isfile(item_path):
+            shutil.copy(item_path, item_path.replace("static", "public", 1))
+        else:
+            new_path = top_dir + "/" + item
+            copy_static_to_public(new_path)
+    return
+
+
 def main():
-    document = """\
-This is a
-Paragraph **with some inline** _text stuff_
-
-### This is a Heading 3 level
-
-> A quote
-
-- unordered list 1
-- unordered list 2
-
-1. Item 1
-2. Item 2
-
-```
-Code code code
-```
-
-
-
-"""
-    print(markdown_to_html_node(document))
-    md = markdown_to_html_node(document)
-    print(md.to_html())
+    clear_public()
+    copy_static_to_public()
 
 
 main()
