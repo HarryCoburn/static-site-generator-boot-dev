@@ -1,8 +1,9 @@
 import re
+from shlex import split
 
 from blocktype import BlockType, block_to_block_type
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from node_func import markdown_to_blocks
+from node_func import markdown_to_blocks, text_to_textnodes
 from textnode import TextNode, TextType
 
 
@@ -31,6 +32,9 @@ def markdown_to_html_node(document):
     for block in blocks:
         block_type = block_to_block_type(block)
         node = block_to_html_node(block, block_type)
+
+        if block_type != BlockType.CODE:
+            node = text_to_children(node, block_type)
         node_list.append(node)
 
     return node_list
@@ -47,23 +51,60 @@ def block_to_html_node(block, block_type):
                 f"h{level}", block[level + 1 :]
             )  # This should get the space
         case BlockType.QUOTE:
-            return HTMLNode("blockquote", block)
+            return HTMLNode("blockquote", block[1:].strip())
         case BlockType.UNORDERED_LIST:
             return HTMLNode("ul", block)
         case BlockType.ORDERED_LIST:
             return HTMLNode("ol", block)
         case BlockType.CODE:
             return HTMLNode("pre", block)
-
         case _:
             raise ValueError("block_to_html_node received unknown BlockType")
 
 
+def text_to_children(node, block_type):
+    if (
+        block_type == BlockType.PARAGRAPH
+        or block_type == BlockType.HEADING
+        or block_type == BlockType.QUOTE
+    ):
+        text = node.value
+        sub_nodes = text_to_textnodes(text)
+        leaf_nodes = []
+        for sub_node in sub_nodes:
+            leaf_nodes.append(text_node_to_html_node(sub_node))
+        return ParentNode(node.tag, leaf_nodes)
+    elif block_type == BlockType.UNORDERED_LIST:
+        split_text = node.value.split("\n")
+        leaf_nodes = []
+        for text in split_text:
+            text = text[2:]
+            sub_nodes = text_to_textnodes(text)
+            sub_leaf_nodes = []
+            for sub_node in sub_nodes:
+                sub_leaf_nodes.append(text_node_to_html_node(sub_node))
+            ordered_list_item = ParentNode("li", sub_leaf_nodes)
+            leaf_nodes.append(ordered_list_item)
+        return ParentNode(node.tag, leaf_nodes)
+    elif block_type == BlockType.ORDERED_LIST:
+        split_text = node.value.split("\n")
+        leaf_nodes = []
+        for text in split_text:
+            text = text[text.index(" ") + 1 :]
+            sub_nodes = text_to_textnodes(text)
+            sub_leaf_nodes = []
+            for sub_node in sub_nodes:
+                sub_leaf_nodes.append(text_node_to_html_node(sub_node))
+            ordered_list_item = ParentNode("li", sub_leaf_nodes)
+            leaf_nodes.append(ordered_list_item)
+        return ParentNode(node.tag, leaf_nodes)
+
+
 def main():
     document = """\
-Paragraph *with some inline* _text stuff_
+This is a Paragraph **with some inline** _text stuff_
 
-### Heading 3
+### This is a Heading 3 level
 
 > A quote
 
@@ -80,7 +121,8 @@ Code code code
 
 
 """
-    print(markdown_to_html_node(document))
+    for item in markdown_to_html_node(document):
+        print(item)
 
 
 main()
