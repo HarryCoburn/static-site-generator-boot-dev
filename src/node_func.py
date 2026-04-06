@@ -92,6 +92,7 @@ def split_nodes_link(old_nodes):
 
 
 def text_to_textnodes(text):
+    text = text.strip()
     base_nodes = split_nodes_delimiter(
         [TextNode(text, TextType.TEXT)], "**", TextType.BOLD
     )

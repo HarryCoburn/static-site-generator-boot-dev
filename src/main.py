@@ -35,9 +35,13 @@ def markdown_to_html_node(document):
 
         if block_type != BlockType.CODE:
             node = text_to_children(node, block_type)
+        else:
+            child_text_node = TextNode(node.value[4:-3], TextType.CODE)
+            child_node = text_node_to_html_node(child_text_node)
+            node = ParentNode(node.tag, [child_node])
         node_list.append(node)
-
-    return node_list
+    node_tree = ParentNode("div", node_list)
+    return node_tree
 
 
 def block_to_html_node(block, block_type):
@@ -68,7 +72,7 @@ def text_to_children(node, block_type):
         or block_type == BlockType.HEADING
         or block_type == BlockType.QUOTE
     ):
-        text = node.value
+        text = node.value.replace("\n", " ")
         sub_nodes = text_to_textnodes(text)
         leaf_nodes = []
         for sub_node in sub_nodes:
@@ -102,7 +106,8 @@ def text_to_children(node, block_type):
 
 def main():
     document = """\
-This is a Paragraph **with some inline** _text stuff_
+This is a
+Paragraph **with some inline** _text stuff_
 
 ### This is a Heading 3 level
 
@@ -121,8 +126,9 @@ Code code code
 
 
 """
-    for item in markdown_to_html_node(document):
-        print(item)
+    print(markdown_to_html_node(document))
+    md = markdown_to_html_node(document)
+    print(md.to_html())
 
 
 main()
