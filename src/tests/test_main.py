@@ -1,7 +1,17 @@
 import unittest
 
-from main import markdown_to_html_node, text_node_to_html_node
+from main import extract_title, markdown_to_html_node, text_node_to_html_node
 from textnode import TextNode, TextType
+
+
+class TestExtractTitle(unittest.TestCase):
+    def text_extract_title(self):
+        markdown = "# This is a title"
+        self.assertEqual("This is a title", extract_title(markdown))
+
+    def text_extract_no_title(self):
+        markdown = "## This is a title"
+        self.assertRaises(Exception, extract_title(markdown))
 
 
 class TestTextNodeToHTMLNode(unittest.TestCase):

@@ -140,9 +140,42 @@ def copy_static_to_public(top_dir="static"):
     return
 
 
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block.startswith("# "):
+            return block[1:].strip()
+    raise Exception("Markdown page has no H1 header for the page title.")
+
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    markdown = ""
+    output = ""
+    with open(from_path, "r") as file:
+        markdown = file.read()
+    with open(template_path, "r") as template_file:
+        output = template_file.read()
+    html_string = markdown_to_html_node(markdown).to_html()
+    page_title = extract_title(markdown)
+
+    output = output.replace("{{ Title }}", page_title)
+    output = output.replace("{{ Content }}", html_string)
+
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
+
+    file_name = os.path.basename(from_path)
+    full_dest_path = dest_path + "/" + file_name
+    print(f"Trying to write {full_dest_path} ")
+    with open(full_dest_path, "w") as html:
+        html.write(output)
+
+
 def main():
     clear_public()
     copy_static_to_public()
+    generate_page("content/index.md", "template.html", "public")
 
 
 main()
