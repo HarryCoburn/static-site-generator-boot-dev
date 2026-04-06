@@ -4,6 +4,8 @@ from textnode import TextNode, TextType
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    """Splits a list of text nodes on a given delimeter.
+    Used for inline tag processing for things that aren't img or a tags"""
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
@@ -92,6 +94,7 @@ def split_nodes_link(old_nodes):
 
 
 def text_to_textnodes(text):
+    """Turns inline text strings in Markdown to proper TextNodes with inline tags added"""
     text = text.strip()
     base_nodes = split_nodes_delimiter(
         [TextNode(text, TextType.TEXT)], "**", TextType.BOLD
@@ -104,21 +107,9 @@ def text_to_textnodes(text):
 
 
 def markdown_to_blocks(markdown):
+    """Splits raw markdown into blocks for processing"""
     lines = markdown.split("\n\n")
     for idx, line in enumerate(lines):
         lines[idx] = line.strip()
     clean_lines = list(filter(lambda x: x != "", lines))
     return clean_lines
-
-
-# md = """
-# This is **bolded** paragraph
-
-# This is another paragraph with _italic_ text and `code` here
-# This is the same paragraph on a new line
-
-# - This is a list
-# - with items
-# """
-
-# print(markdown_to_blocks(md))

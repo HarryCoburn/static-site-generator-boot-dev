@@ -1,4 +1,6 @@
 class HTMLNode:
+    """Base Class for HTML nodes"""
+
     def __init__(self, tag=None, value=None, children=None, props=None) -> None:
         self.tag = tag  # string reprenting HTML tag name. None renders raw text.
         self.value = value  # Value of the html tag. None assumes tag has children
@@ -23,6 +25,8 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
+    """Represents a leaf in the HTML tree. Must have a value and no children."""
+
     def __init__(self, tag, value, props=None) -> None:
         super().__init__(tag=tag, value=value, props=props)
 
@@ -42,6 +46,8 @@ class LeafNode(HTMLNode):
 
 
 class ParentNode(HTMLNode):
+    """Represents a parent node in the HTML tree. Must have children and no value."""
+
     def __init__(self, tag, children, props=None) -> None:
         super().__init__(tag=tag, children=children, props=props)
 

@@ -11,17 +11,8 @@ class BlockType(Enum):
     ORDERED_LIST = "ordered_list"
 
 
-# May not be needed
-class BlockNode:
-    def __init__(self, text, block_type):
-        self.text = text
-        self.block_type = block_type
-
-    def __repr__(self):
-        return f"BlockNode({self.text}, {self.block_type.value})"
-
-
 def block_to_block_type(line):
+    """Takes a block of Markdown line and determines the type"""
     if re.match(r"^(#{1,6}) ", line):
         return BlockType.HEADING
     if re.match(r"^```\n[\s\S]*```\Z", line):

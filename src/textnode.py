@@ -11,6 +11,8 @@ class TextType(Enum):
 
 
 class TextNode:
+    """Information node for inline tags"""
+
     def __init__(self, text, text_type, url=None) -> None:
         self.text = text  # The text content of the node
         self.text_type = text_type  # the TextType of the node

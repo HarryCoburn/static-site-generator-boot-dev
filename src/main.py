@@ -8,6 +8,7 @@ from textnode import TextNode, TextType
 
 
 def text_node_to_html_node(text_node):
+    """Turns TextNodes into appropriate inline LeafNodes"""
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(None, text_node.text)
@@ -26,6 +27,8 @@ def text_node_to_html_node(text_node):
 
 
 def markdown_to_html_node(document):
+    """Main function to begin turning markdown into HTML
+    Markdown -> Blocks -> HTMLNodes -> Parent and Leaf Nodes with inline text processing"""
     blocks = markdown_to_blocks(document)
     node_list = []
 
@@ -45,6 +48,7 @@ def markdown_to_html_node(document):
 
 
 def block_to_html_node(block, block_type):
+    """Turns Markdown blocks into HTMLNodes"""
     match block_type:
         case BlockType.PARAGRAPH:
             return HTMLNode("p", block)
@@ -67,6 +71,7 @@ def block_to_html_node(block, block_type):
 
 
 def text_to_children(node, block_type):
+    """Takes the text of a block and makes the appropriate child nodes"""
     if (
         block_type == BlockType.PARAGRAPH
         or block_type == BlockType.HEADING
